@@ -6,10 +6,6 @@
     <description>Project App using Spring boot - Backend</description>
     <packaging>jar</packaging>
     <version>1.0-RELEASE</version>
-	   <properties>
-    <maven.compiler.source>8</maven.compiler.source>
-    <maven.compiler.target>8</maven.compiler.target>
-  </properties>
     <parent>
         <groupId>adi</groupId>
         <artifactId>Project</artifactId>
