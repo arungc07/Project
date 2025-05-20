@@ -1,9 +1,8 @@
-# Project with Frontend and Backend which is to launch the algorithm and the connectivity between the kafka server and the postgres DB
+# Project with Frontend and Backend which is to give details from the H2 internal database
 
 ## Project
 You can create the configuration with the spring boot application and use the same config to run.
 
-Kafka consumer and producers will be created based on the configuration and the data fed from the csv will be read analysed and passed to topics. 
 
 ## Prerequisites
 
