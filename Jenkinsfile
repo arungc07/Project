@@ -9,13 +9,14 @@ pipeline {
         stage('test') {
             steps {
                 sh 'mvn test'
+                sh 'ls -la target/surefire-reports || echo "No test reports found!"'
             }
             post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                    archiveArtifacts 'target/*.jar'
-                }
-            }
+             always {
+                junit 'target/surefire-reports/*.xml'
+                archiveArtifacts 'target/*.jar'
+                    }
+           }
         }
         stage('run') {
             steps {
