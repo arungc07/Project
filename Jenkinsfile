@@ -20,10 +20,7 @@ pipeline {
             stage(docker) {
                 steps {
                         dir("frontend") {   sh 'docker build -t frontend:latest .'   }
-                }
-                
-                steps {
-                    dir("backend") { sh 'docker build -t backend:latest .' }
+                        dir("backend") { sh 'docker build -t backend:latest .' }
                 }
             }
             stage("docker run") {
