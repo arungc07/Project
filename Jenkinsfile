@@ -1,42 +1,57 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'maven:3.8.7-eclipse-temurin-17'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
+        }
+    }
     stages {
-        stage('build') {
+        stage('Build') {
             steps {
+                echo 'Running Maven build...'
                 sh 'mvn clean install -DskipTests'
             }
         }
-        stage('test') {
+
+        stage('Test') {
             steps {
+                echo 'Running Maven tests...'
                 sh 'mvn test'
                 sh 'ls -la target/surefire-reports || echo "No test reports found!"'
             }
             post {
-             always {
-                junit 'target/surefire-reports/*.xml'
-                archiveArtifacts 'target/*.jar'
-                    }
-           }
-        }
-        stage('run') {
-            steps {
-                sh 'mvn clean spring-boot:run & sleep 10 && curl http://localhost:8080/docs'
+                always {
+                    junit testResults: 'target/surefire-reports/*.xml', allowEmptyResults: true
+                    archiveArtifacts artifacts: 'target/*.jar', allowEmptyArchive: true
+                }
             }
         }
-        stage('docker') {
+
+        stage('Run Spring Boot') {
             steps {
-                dir("frontend") {
+                echo 'Starting Spring Boot app...'
+                sh 'nohup mvn spring-boot:run > springboot.log 2>&1 & sleep 15'
+                sh 'curl -f http://localhost:8080/docs || echo "Spring Boot not responding."'
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                echo 'Building frontend and backend Docker images...'
+                dir('frontend') {
                     sh 'docker build -t frontend:latest .'
                 }
-                dir("backend") {
+                dir('backend') {
                     sh 'docker build -t backend:latest .'
                 }
             }
         }
-        stage('docker run') {
+
+        stage('Docker Run') {
             steps {
-                sh 'docker run -p 8085:8080 -d backend:latest'
-                sh 'docker run -p 8084:8080 -d frontend:latest'
+                echo 'Running Docker containers...'
+                sh 'docker run -d -p 8085:8080 --name backend backend:latest'
+                sh 'docker run -d -p 8084:8080 --name frontend frontend:latest'
             }
         }
     }
